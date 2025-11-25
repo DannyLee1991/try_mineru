@@ -6,12 +6,12 @@ WORKDIR /app
 
 # 安装系统依赖
 # poppler-utils: pdf2image需要
-# libgl1-mesa-glx: OpenGL库，提供libGL.so.1
+# libgl1: PaddleOCR需要
 # libglib2.0-0: PaddleOCR需要
 # libsm6 libxext6 libxrender-dev: 图像处理需要
 RUN apt-get update && apt-get install -y \
     poppler-utils \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
@@ -31,6 +31,11 @@ COPY . .
 ENV MINERU_MODEL_SOURCE=modelscope
 # 设备配置：cpu, cuda, cuda:0 等，默认使用cpu（可在运行时通过 -e MINERU_DEVICE_MODE=cuda 覆盖）
 ENV MINERU_DEVICE_MODE=cpu
+# 限制线程数，避免 onnxruntime 的 pthread_create 权限问题
+ENV OMP_NUM_THREADS=1
+ENV MKL_NUM_THREADS=1
+ENV NUMEXPR_NUM_THREADS=1
+ENV OPENBLAS_NUM_THREADS=1
 
 # 暴露端口
 EXPOSE 8000
