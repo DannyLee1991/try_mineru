@@ -1,0 +1,11 @@
+version: '3'
+services:
+  mineru_test_api:
+    image: registry.cn-hangzhou.aliyuncs.com/loopeai-dev/mineru_test_api:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - MINERU_DEVICE_MODE=cuda:0
+      - OPENBLAS_NUM_THREADS=1
+    command: uvicorn main:app --host 0.0.0.0 --port 8000

@@ -6,12 +6,12 @@ WORKDIR /app
 
 # 安装系统依赖
 # poppler-utils: pdf2image需要
-# libgl1: PaddleOCR需要
+# libgl1-mesa-glx: OpenGL库，提供libGL.so.1
 # libglib2.0-0: PaddleOCR需要
 # libsm6 libxext6 libxrender-dev: 图像处理需要
 RUN apt-get update && apt-get install -y \
     poppler-utils \
-    libgl1 \
+    libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
