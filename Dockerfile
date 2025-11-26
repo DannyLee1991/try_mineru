@@ -1,5 +1,5 @@
 # 使用Python 3.11作为基础镜像
-FROM pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 
 # 设置工作目录
 WORKDIR /app
