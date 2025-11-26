@@ -1,6 +1,10 @@
 # 使用Python 3.11作为基础镜像
 FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 
+# 设置时区环境变量，避免交互式提示
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Shanghai
+
 # 设置工作目录
 WORKDIR /app
 
@@ -10,10 +14,12 @@ WORKDIR /app
 # libgl1: PaddleOCR需要
 # libglib2.0-0: PaddleOCR需要
 # libsm6 libxext6 libxrender-dev: 图像处理需要
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
+    tzdata \
     software-properties-common \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     && add-apt-repository ppa:deadsnakes/ppa -y \
-    && DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
+    && apt-get update && apt-get install -y \
     python3.11 \
     python3.11-venv \
     python3.11-dev \
