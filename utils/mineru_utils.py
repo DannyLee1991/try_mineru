@@ -1,6 +1,9 @@
 import os
+import logging
 from typing import Optional
 from mineru.cli.common import read_fn, do_parse
+
+logger = logging.getLogger(__name__)
 
 
 def configure_pytorch_safe_loading():
@@ -20,8 +23,13 @@ def configure_pytorch_safe_loading():
         # 方法1: 添加安全全局变量
         try:
             from doclayout_yolo.nn.tasks import YOLOv10DetectionModel
-            # 添加安全全局变量，允许加载包含此类的模型
-            serialization.add_safe_globals([YOLOv10DetectionModel])
+            # 添加安全全局变量，允许加载包含此类的模型（仅在新版本 torch 提供该 API 时）
+            if hasattr(serialization, "add_safe_globals"):
+                serialization.add_safe_globals([YOLOv10DetectionModel])
+            else:
+                logger.warning(
+                    "torch.serialization.add_safe_globals 不存在，跳过安全全局注册（请使用 torch>=2.4 如果需要此功能）"
+                )
         except ImportError:
             # 如果导入失败，跳过
             pass
