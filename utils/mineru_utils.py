@@ -78,6 +78,17 @@ def parse_doc_to_md(file_path: str, output_dir: str, device: Optional[str] = Non
             except ImportError:
                 device = 'cpu'
     
+    # 验证设备是否可用，如果不可用则回退到 CPU
+    if device and device.startswith('cuda'):
+        try:
+            import torch
+            if not torch.cuda.is_available():
+                print(f"警告: 配置的设备 {device} 不可用（未检测到 NVIDIA GPU），回退到 CPU")
+                device = 'cpu'
+        except (ImportError, Exception) as e:
+            print(f"警告: 无法验证 CUDA 设备，回退到 CPU: {e}")
+            device = 'cpu'
+    
     # 设置环境变量，供mineru使用
     original_device_mode = os.getenv('MINERU_DEVICE_MODE')
     os.environ['MINERU_DEVICE_MODE'] = device
