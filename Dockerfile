@@ -5,11 +5,19 @@ FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 WORKDIR /app
 
 # 安装系统依赖
+# python3.11 python3.11-venv python3-pip: Python 3.11 和 pip
 # poppler-utils: pdf2image需要
 # libgl1: PaddleOCR需要
 # libglib2.0-0: PaddleOCR需要
 # libsm6 libxext6 libxrender-dev: 图像处理需要
-RUN apt-get update && apt-get install -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
+    && DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3-pip \
     poppler-utils \
     libgl1 \
     libglib2.0-0 \
@@ -17,6 +25,11 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# 创建 Python 3.11 的符号链接和更新 pip
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 \
+    && python3 -m pip install --upgrade pip
 
 # 复制requirements文件
 COPY requirements.txt .
