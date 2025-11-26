@@ -1,5 +1,5 @@
 # 使用Python 3.11作为基础镜像
-FROM docker.m.daocloud.io/vllm/vllm-openai:v0.10.1.1
+FROM pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
 
 # 设置工作目录
 WORKDIR /app
