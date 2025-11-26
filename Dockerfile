@@ -4,6 +4,9 @@ FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 # 设置时区环境变量，避免交互式提示
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai
+# 让容器默认暴露所有 GPU，并加载驱动工具能力
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 # 设置工作目录
 WORKDIR /app
@@ -37,6 +40,13 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
     && update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 \
     && python3 -m pip install --upgrade pip
 
+# 先安装与 CUDA 12.2 对应的 GPU 版 PyTorch，避免后续 requirements 覆盖为 CPU 版
+ARG TORCH_VERSION=2.3.1
+ARG TORCHVISION_VERSION=0.18.1
+ARG CUDA_PYTORCH_TAG=cu121
+RUN pip install --no-cache-dir torch==${TORCH_VERSION}+${CUDA_PYTORCH_TAG} torchvision==${TORCHVISION_VERSION}+${CUDA_PYTORCH_TAG} \
+    --index-url https://download.pytorch.org/whl/${CUDA_PYTORCH_TAG}
+
 # 复制requirements文件
 COPY requirements.txt .
 
@@ -61,4 +71,3 @@ EXPOSE 8000
 
 # 启动命令
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
